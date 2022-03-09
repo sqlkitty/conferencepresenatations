@@ -31,7 +31,7 @@ CREATE DATABASE testing
 
 --how to see all the columns in the audit file 
 SELECT *
-FROM sys.fn_get_audit_file ('/var/opt/mssql/data/audit/*.sqlaudit',default,default)
+FROM sys.fn_get_audit_file ('e:\audits\*.sqlaudit',default,default)
 where  DATEADD(mi, DATEPART(TZ, SYSDATETIMEOFFSET()), event_time) > DATEADD(HOUR, -24, GETDATE())
 order by DATEADD(mi, DATEPART(TZ, SYSDATETIMEOFFSET()), event_time) desc 
 
@@ -41,7 +41,7 @@ SELECT distinct DATEADD(mi, DATEPART(TZ, SYSDATETIMEOFFSET()), event_time) as ev
 aa.name as audit_action,statement,succeeded, server_instance_name, 
 database_name, schema_name, session_server_principal_name, server_principal_name, 
 object_Name, file_name, client_ip, application_name, host_name
-FROM sys.fn_get_audit_file ('/var/opt/mssql/data/audit/*.sqlaudit',default,default) af
+FROM sys.fn_get_audit_file ('e:\audits\*.sqlaudit',default,default) af
 INNER JOIN sys.dm_audit_actions aa ON aa.action_id = af.action_id
 where  DATEADD(mi, DATEPART(TZ, SYSDATETIMEOFFSET()), event_time) > DATEADD(HOUR, -24, GETDATE())
 order by DATEADD(mi, DATEPART(TZ, SYSDATETIMEOFFSET()), event_time) desc
@@ -120,6 +120,8 @@ CREATE TABLE [dbo].[testing](
 USE [testing]
 GRANT ALTER ON [dbo].[testing] TO [testing]
 
+
+
 --setup db audit with schema_object_permission_change_group on testing db via gui 
 USE master
 ALTER SERVER AUDIT SPECIFICATION [ServerAuditSpecification] 
@@ -142,7 +144,7 @@ INSERT INTO [dbo].[testing]
 USE [master]
 CREATE SERVER AUDIT [AuditSpecification_testingdb]
 TO FILE 
-(FILEPATH = N'/var/opt/mssql/data/audit/testingdb/'
+(FILEPATH = N'e:\audits\testing\'
 ,MAXSIZE = 10 MB
 ,MAX_FILES = 10
 ,RESERVE_DISK_SPACE = OFF
@@ -250,11 +252,11 @@ END;
 USE [master]
 CREATE SERVER AUDIT [AuditSpecification]
 TO FILE 
-(	FILEPATH = N'/var/opt/mssql/data/audit/'
+(	FILEPATH = N'e:\audits\'
 	,MAXSIZE = 50 MB
 	,MAX_FILES = 4
 	,RESERVE_DISK_SPACE = OFF
-) WITH (QUEUE_DELAY = 1000, ON_FAILURE = CONTINUE, AUDIT_GUID = '27083d3e-db30-47a2-9d4c-c7e50b06ef35')
+) WITH (QUEUE_DELAY = 1000, ON_FAILURE = CONTINUE)
 WHERE ([session_server_principal_name]<>'ubuntusql1\ubuntusql1$'
 		and schema_name <>'sys')
 ALTER SERVER AUDIT [AuditSpecification] WITH (STATE = ON)
@@ -317,7 +319,7 @@ WITH (STATE = ON) */
 USE [master]
 CREATE SERVER AUDIT [AuditSpecification_testingdb]
 TO FILE 
-(FILEPATH = N'/var/opt/mssql/data/audit/testingdb/'
+(FILEPATH = N'e:\audits\testing\'
 ,MAXSIZE = 10 MB
 ,MAX_FILES = 10
 ,RESERVE_DISK_SPACE = OFF
