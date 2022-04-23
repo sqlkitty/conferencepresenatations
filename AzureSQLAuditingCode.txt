@@ -1,0 +1,25 @@
+Powershell to modify the default auditing policy 
+
+Get-AzSqlServerAudit -ResourceGroupName 'dbops' -Servername 'jbauditing'
+
+Set-AzSqlServerAudit -ResourceGroupName 'dbops' -ServerName 'jbauditing' ` -AuditActionGroup APPLICATION_ROLE_CHANGE_PASSWORD_GROUP, DATABASE_CHANGE_GROUP, `
+DATABASE_OBJECT_CHANGE_GROUP, DATABASE_OBJECT_OWNERSHIP_CHANGE_GROUP, ` DATABASE_OBJECT_PERMISSION_CHANGE_GROUP, DATABASE_OWNERSHIP_CHANGE_GROUP, ` DATABASE_PERMISSION_CHANGE_GROUP, DATABASE_PRINCIPAL_CHANGE_GROUP, ` DATABASE_PRINCIPAL_IMPERSONATION_GROUP, DATABASE_ROLE_MEMBER_CHANGE_GROUP, ` SCHEMA_OBJECT_CHANGE_GROUP, SCHEMA_OBJECT_OWNERSHIP_CHANGE_GROUP, ` SCHEMA_OBJECT_PERMISSION_CHANGE_GROUP, USER_CHANGE_PASSWORD_GROUP
+
+
+Kusto query for log analytics workspace auditing 
+
+AzureDiagnostics
+| where Category == 'SQLSecurityAuditEvents’
+	and TimeGenerated > ago(1d) 
+| project
+	event_time_t, 
+	database_name_s, 
+	statement_s, 
+	server_principal_name_s, 
+	succeeded_s,
+	client_ip_s, 
+	application_name_s, 
+	additional_information_s, 
+	data_sensitivity_information_s
+| order by event_time_t desc
+
