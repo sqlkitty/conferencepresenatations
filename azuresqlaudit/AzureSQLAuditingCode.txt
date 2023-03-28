@@ -9,7 +9,7 @@ DATABASE_OBJECT_CHANGE_GROUP, DATABASE_OBJECT_OWNERSHIP_CHANGE_GROUP, ` DATABASE
 Kusto query for log analytics workspace auditing 
 
 AzureDiagnostics
-| where Category == 'SQLSecurityAuditEvents’
+| where Category == 'SQLSecurityAuditEvents'
 	and TimeGenerated > ago(1d) 
 | project
 	event_time_t, 
